@@ -32,25 +32,31 @@ It takes in the resource ID (`claim_id`) and schema ID (`endpoint_id`) and trans
 git clone https://github.com/JoeHossam/data-transformation
 ```
 
-2. make sure you're inside the project directory and install the dependecies
+2. cd into the project directory
+
+```
+cd data-transformation
+```
+
+3. Install the dependecies
 
 ```
 composer install
 ```
 
-3. Run the database migrations
+4. Run the database migrations
 
 ```
 php artisan migrate
 ```
 
-4. Seed the database
+5. Seed the database
 
 ```
 php artisan db:seed
 ```
 
-5. Start the development server
+6. Start the development server
 
 ```
 php artisan serve
@@ -62,7 +68,7 @@ The application will be available at `http://localhost:8000` and make sure form 
 
 you can start making request to `POST /api/general/external-integration`
 
-Expectes body
+Expected body
 
 ```JSON
 {
@@ -104,3 +110,13 @@ Example
     ]
 }
 ```
+
+## Test
+
+to run unit testing on the project
+
+```
+php artisan test
+```
+
+Tests are made for the transformation service

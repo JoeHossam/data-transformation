@@ -19,7 +19,7 @@ class Claim extends Model
         return $this->belongsTo(Payer::class);
     }
 
-    public function statuses(): HasMany
+    public function claimStatus(): HasMany
     {
         return $this->hasMany(ClaimStatus::class);
     }

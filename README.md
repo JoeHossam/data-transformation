@@ -1,66 +1,106 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Data Transformation
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This project is about sending data to a third party application after converting it to the required schema by this app.  
+It takes in the resource ID (`claim_id`) and schema ID (`endpoint_id`) and transforms the resource's data to this specific schema and return it.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+-   Configurable mapping rules stored in the database
+-   Support for complex and nested data types: attributes, objects, arrays, and object lists
+-   Logging and custom error handling
+-   Extensible design for adding new data types and collections
+-   Caching requests for improved performance
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Mapping rules assumptions
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+-   The `internal_field` is the field inside our own database
+    -   case1: `[fieldName]` will refer to a column inside the `claim` table
+    -   case2: `[tableName].[fieldName]` will refer to a column inside a table that belongs to the claim.
+-   The rule with an `object_list` type will always return a collection (having the collection name as the `internal_field`) and any children to that rule will act as the column names inside this collection.
 
-## Learning Laravel
+## Prerequisites
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+-   PHP 8.0 or higher
+-   Composer
+-   Laravel 8.11
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Installation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. clone the repository.
 
-## Laravel Sponsors
+```
+git clone https://github.com/JoeHossam/data-transformation
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+2. make sure you're inside the project directory and install the dependecies
 
-### Premium Partners
+```
+composer install
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+3. Run the database migrations
 
-## Contributing
+```
+php artisan migrate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+4. Seed the database
 
-## Code of Conduct
+```
+php artisan db:seed
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+5. Start the development server
 
-## Security Vulnerabilities
+```
+php artisan serve
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+The application will be available at `http://localhost:8000` and make sure form the console.
 
-## License
+## Usage
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+you can start making request to `POST /api/general/external-integration`
+
+Expectes body
+
+```JSON
+{
+    "claim_id": 1,
+    "endpoint_id": 22
+}
+```
+
+-   `claim_id` is the resource ID.
+-   `endpoint_id` will apply the rules that have this endpoint ID
+
+Expected response is based on the schema found in the DB  
+Example
+
+```JSON
+{
+    "claimReference": "CLM-8603-zuxf",
+    "payer": {
+        "payerName": "Kreiger-Wuckert",
+        "payerPhone": "1-747-726-8812"
+    },
+    "notes": [
+        "Repellendus e...",
+        "Error...."
+    ],
+    "claimStatuses": [
+        {
+            "date": "2024-01-21 02:28:41",
+            "status": "approved"
+        },
+        {
+            "date": "2024-04-10 09:55:04",
+            "status": "completed"
+        },
+        {
+            "date": "2024-05-07 08:10:24",
+            "status": "approved"
+        }
+    ]
+}
+```

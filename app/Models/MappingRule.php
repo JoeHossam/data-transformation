@@ -17,4 +17,9 @@ class MappingRule extends Model
         'is_required',
         'default_value'
     ];
+
+    public function children()
+    {
+        return $this->hasMany(self::class, 'parent_id', 'id');
+    }
 }

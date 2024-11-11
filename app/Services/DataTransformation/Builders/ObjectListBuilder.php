@@ -24,9 +24,12 @@ class ObjectListBuilder implements DataBuilder
             claim: $context->getClaim()
         );
 
+        $colsToShow = $node->children()->get();
+
         return $collection->map(function ($row) use ($node) {
-            return $node->children()->get(['internal_field'])->mapWithKeys(function ($child) use ($row) {
-                $value = data_get($row, $child->internal_field);
+            $data = $row->toArray();
+            return $node->children()->get()->mapWithKeys(function ($child) use ($data) {
+                $value = data_get($data, $child->internal_field);
                 return [
                     $child->external_field =>
                         $this->validator->validateAndTransform($child, $value)

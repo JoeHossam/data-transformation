@@ -11,13 +11,6 @@ It takes in the resource ID (`claim_id`) and schema ID (`endpoint_id`) and trans
 -   Extensible design for adding new data types and collections
 -   Caching requests for improved performance
 
-## Mapping rules assumptions
-
--   The `internal_field` is the field inside our own database
-    -   case1: `[fieldName]` will refer to a column inside the `claim` table
-    -   case2: `[tableName].[fieldName]` will refer to a column inside a table that belongs to the claim.
--   The rule with an `object_list` type will always return a collection (having the collection name as the `internal_field`) and any children to that rule will act as the column names inside this collection.
-
 ## Prerequisites
 
 -   PHP 8.0 or higher
@@ -62,7 +55,41 @@ php artisan db:seed
 php artisan serve
 ```
 
-The application will be available at `http://localhost:8000` and make sure form the console.
+The application by default will be available at `http://localhost:8000`. make sure form the console.
+
+## Implementation logic
+
+The application will transform different types of data based on mapping rules.
+
+### Supported Data Types
+
+-   `Attribute` plain value (string, number, boolean, etc..)
+-   `object` a JSON object with nested structure
+-   `array` List of values
+-   `object_list` represents a collection in the database
+
+The application uses factory pattern to build the desired object
+
+```PHP
+interface DataBuilder
+{
+    public function build(MappingRule $node, TransformationContext $context);
+}
+```
+
+### Transformation Flow
+
+1.  Schema root elements (elements with no `parent_id`) are loaded form the database
+1.  Each element is processed by its corresponding builder (e.g. AttributeBuilder)
+1.  Validation is performed during transformation
+1.  Results are cached for improved performance
+
+### Mapping rules assumptions
+
+-   The `internal_field` is the field inside our own database
+    -   case1: `[fieldName]` will refer to a column inside the `claim` table
+    -   case2: `[tableName].[fieldName]` will refer to a column inside a table that belongs to the claim.
+-   The rule with an `object_list` type will always return a collection (having the collection name as the `internal_field`) and any children to that rule will act as the column names inside this collection.
 
 ## Usage
 

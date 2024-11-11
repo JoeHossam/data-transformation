@@ -5,16 +5,9 @@ namespace App\Services\DataTransformation\Builders;
 use App\Models\MappingRule;
 use App\Services\DataTransformation\Helpers\BuilderFactory;
 use App\Services\DataTransformation\Helpers\TransformationContext;
-use App\Services\DataTransformation\Interfaces\DataBuilder;
-use App\Services\DataTransformation\Validators\ValidationService;
 
-class ObjectBuilder implements DataBuilder
+class ObjectBuilder extends AbstractDataBuilder
 {
-    public function __construct(
-        private readonly ValidationService $validator
-    ) {
-    }
-
     public function build(MappingRule $node, TransformationContext $context)
     {
         return $node->children()->get()->mapWithKeys(function ($child) use ($context) {

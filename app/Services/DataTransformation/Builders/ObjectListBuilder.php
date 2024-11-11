@@ -5,18 +5,11 @@ namespace App\Services\DataTransformation\Builders;
 use App\Exceptions\TransformationException;
 use App\Models\Claim;
 use App\Models\MappingRule;
-use App\Services\DataTransformation\Validators\ValidationService;
 use Illuminate\Support\Collection;
 use App\Services\DataTransformation\Helpers\TransformationContext;
-use App\Services\DataTransformation\Interfaces\DataBuilder;
 
-class ObjectListBuilder implements DataBuilder
+class ObjectListBuilder extends AbstractDataBuilder
 {
-    public function __construct(
-        private readonly ValidationService $validator
-    ) {
-    }
-
     public function build(MappingRule $node, TransformationContext $context)
     {
         $collection = $this->getCollectionForObjectList(
